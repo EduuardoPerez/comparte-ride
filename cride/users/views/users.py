@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 # Serializers
-from cride.serializers.users import UserLoginSerializer
+from cride.users.serializers import UserLoginSerializer
 
 
 class UserLoginAPIView(APIView):
