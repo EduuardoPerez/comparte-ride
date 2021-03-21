@@ -17,6 +17,7 @@ from rest_framework.validators import UniqueValidator
 from cride.users.models import User, Profile
 
 # Utilities
+import jwt
 from datetime import timedelta
 
 
@@ -97,7 +98,14 @@ class UserSignUpSerializer(serializers.Serializer):
 
     def gen_verification_token(self, user):
         """Create JWT token that the user can use to verify its account."""
-        return 'abc'
+        exp_date = timezone.now() + timedelta(days=3)
+        payload = {
+            'user': user.username,
+            'exp': int(exp_date.timestamp()),
+            'type': 'email_confirmation'
+        }
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+        return token
 
 
 class UserLoginSerializer(serializers.Serializer):
