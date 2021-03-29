@@ -16,6 +16,9 @@ from rest_framework.validators import UniqueValidator
 # Models
 from cride.users.models import User, Profile
 
+# Serializers
+from cride.users.serializers.profiles import ProfileModelSerializer
+
 # Utilities
 import jwt
 from datetime import timedelta
@@ -23,6 +26,8 @@ from datetime import timedelta
 
 class UserModelSerializer(serializers.ModelSerializer):
     """User model serializer."""
+
+    profile = ProfileModelSerializer(read_only=True)
 
     class Meta:
         """Meta class."""
@@ -33,7 +38,8 @@ class UserModelSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'email',
-            'phone_number'
+            'phone_number',
+            'profile'
         )
 
 
@@ -105,7 +111,7 @@ class UserSignUpSerializer(serializers.Serializer):
             'type': 'email_confirmation'
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
-        return token
+        return token.decode()
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -138,7 +144,7 @@ class AccountVerificationSerializer(serializers.Serializer):
     token = serializers.CharField()
 
     def validate_token(self, data):
-        """Verify if token is valid."""
+        """Verify token is valid."""
         try:
             payload = jwt.decode(data, settings.SECRET_KEY, algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
